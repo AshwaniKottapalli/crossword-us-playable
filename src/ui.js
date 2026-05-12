@@ -147,7 +147,18 @@ export function flashCellWrong(r, c) {
   cellEl.classList.remove('wrong-flash');
   void cellEl.offsetWidth;
   cellEl.classList.add('wrong-flash');
-  setTimeout(() => cellEl.classList.remove('wrong-flash'), 450);
+  setTimeout(() => cellEl.classList.remove('wrong-flash'), 560);
+}
+
+export function flashCellCorrect(r, c) {
+  // the cell will have .correct (not .empty) at this point.
+  const cellEl = document.querySelector(`.cell.correct[data-r="${r}"][data-c="${c}"]`)
+              || document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  if (!cellEl) return;
+  cellEl.classList.remove('correct-flash');
+  void cellEl.offsetWidth;
+  cellEl.classList.add('correct-flash');
+  setTimeout(() => cellEl.classList.remove('correct-flash'), 430);
 }
 
 export function setBackdrop(url) {

@@ -1,6 +1,6 @@
 // State machine: LOADING → INTRO → PLAYING → WIN → CTA.
 
-import { PUZZLE, bankForWord, wordCells } from './puzzles.js';
+import { PUZZLE, bankForWord } from './puzzles.js';
 import * as Grid from './grid.js';
 import * as Bank from './bank.js';
 import * as Hint from './hint.js';
@@ -91,11 +91,10 @@ function advanceActiveWord() {
 
 function findCellForLetter(ch) {
   if (!activeWord) return null;
-  for (const { r, c, cell } of wordCells(PUZZLE, activeWord)) {
-    if (cell && !cell.prefilled && !cell.filled && cell.ch === ch) {
-      return { r, c, ch };
-    }
-  }
+  // strict cursor order: only the next-empty cell of the active word is a valid landing.
+  // a letter that exists in the word but not at the cursor counts as wrong.
+  const next = Grid.findFirstEmptyOf(activeWord);
+  if (next && next.ch === ch) return next;
   return null;
 }
 
@@ -109,6 +108,7 @@ function updateCursor() {
 function onCorrectDrop(r, c, ch, tile) {
   Audio.play('pop');
   Grid.markCorrect(r, c, ch);
+  UI.flashCellCorrect(r, c);
   streak++;
   UI.setStreak(streak);
   updateCursor();

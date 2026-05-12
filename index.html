@@ -121,11 +121,21 @@
 
   /* ============ WRONG-DROP CELL FLASH ============ */
   @keyframes wrongFlash {
-    0%   { background:#ffffff; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
-    30%  { background:#ff5b6c; box-shadow: inset 0 0 0 2px #bf0a30, 0 0 14px rgba(255,40,60,0.7); }
-    100% { background:#ffffff; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+    0%   { background:#ffffff; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); transform: translateX(0); }
+    15%  { background:#ff5b6c; box-shadow: inset 0 0 0 3px #bf0a30, 0 0 18px rgba(255,40,60,0.9); transform: translateX(-3px); }
+    35%  { background:#ff5b6c; transform: translateX(3px); }
+    55%  { background:#ff5b6c; transform: translateX(-2px); }
+    100% { background:#ffffff; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); transform: translateX(0); }
   }
-  .cell.wrong-flash{ animation: wrongFlash .45s ease-out; }
+  .cell.wrong-flash{ animation: wrongFlash .55s ease-out; }
+
+  /* ============ CORRECT-DROP CELL FLASH ============ */
+  @keyframes correctFlash {
+    0%   { background:#a8f0a0; box-shadow: 0 0 0 3px #4ec84e, 0 0 18px rgba(110,224,74,0.85); }
+    60%  { background:#cdf0c5; }
+    100% { background:#dff1f4; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+  }
+  .cell.correct-flash{ animation: correctFlash .42s ease-out; }
 
   /* ============ TILE WIGGLE ============ */
   @keyframes tileWiggle {
