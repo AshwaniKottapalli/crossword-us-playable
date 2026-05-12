@@ -100,10 +100,9 @@ export function setStreak(n) {
     el.classList.remove('show', 'fire', 'bump');
     return;
   }
-  el.textContent = n >= 4 ? '🔥 ON FIRE!' : `🔥 ×${n}`;
+  el.textContent = `🔥 ×${n}`;
   el.classList.toggle('fire', n >= 4);
   el.classList.add('show');
-  // restart bump animation
   el.classList.remove('bump');
   void el.offsetWidth;
   el.classList.add('bump');

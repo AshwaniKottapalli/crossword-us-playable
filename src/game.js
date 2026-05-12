@@ -95,12 +95,18 @@ function onCorrectDrop(r, c, ch, tile) {
   UI.setStreak(streak);
 
   // detect newly-completed words (a drop may complete more than one word via crossings)
+  let praisedThisDrop = false;
   for (const w of PUZZLE.words) {
     if (completedWords.has(w.id)) continue;
     if (Grid.isWordComplete(w)) {
       completedWords.add(w.id);
       Cascade.celebrateWord(w, Audio);
-      UI.popPraise();
+      if (!praisedThisDrop) {
+        // delay so the praise lands AFTER the cell cascade kicks in,
+        // and isn't drowned out by the ring burst + shake on the same frame.
+        setTimeout(() => UI.popPraise(), 280);
+        praisedThisDrop = true;
+      }
     }
   }
 

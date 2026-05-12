@@ -73,24 +73,26 @@
 
   /* ============ PRAISE POPS ============ */
   #praise{
-    position:absolute; left:50%; top:46%;
+    position:absolute; left:50%; top:44%;
     transform: translate(-50%, -50%) scale(0.4);
-    font-size: 56px; font-weight: 900; letter-spacing: 2px;
+    font-size: 64px; font-weight: 900; letter-spacing: 2px;
     text-align:center; pointer-events:none; z-index:15;
     opacity: 0;
-    background: linear-gradient(180deg, #ffffff 0%, #ffd84a 45%, #bf0a30 100%);
-    -webkit-background-clip: text; background-clip: text;
-    color: transparent;
-    -webkit-text-stroke: 2px rgba(0,0,32,0.85);
-    text-shadow: 0 6px 16px rgba(0,0,0,0.65);
+    color: #ffd84a;
+    text-shadow:
+      0 0 14px rgba(0,0,0,0.85),
+      0 4px 0 #bf0a30,
+      0 6px 18px rgba(0,0,0,0.7),
+      0 0 24px rgba(255,216,74,0.55);
     white-space:nowrap;
   }
-  #praise.pop{ animation: praisePop .9s cubic-bezier(.34,1.56,.64,1) forwards; }
+  #praise.pop{ animation: praisePop 1.25s cubic-bezier(.34,1.56,.64,1) forwards; }
   @keyframes praisePop {
-    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4) rotate(-4deg); }
-    25%  { opacity: 1; transform: translate(-50%, -55%) scale(1.25) rotate(2deg); }
-    55%  { opacity: 1; transform: translate(-50%, -55%) scale(1.0) rotate(0deg); }
-    100% { opacity: 0; transform: translate(-50%, -70%) scale(0.9) rotate(0deg); }
+    0%   { opacity: 0; transform: translate(-50%, -40%) scale(0.4) rotate(-5deg); }
+    18%  { opacity: 1; transform: translate(-50%, -55%) scale(1.35) rotate(3deg); }
+    35%  { opacity: 1; transform: translate(-50%, -55%) scale(1.05) rotate(0deg); }
+    72%  { opacity: 1; transform: translate(-50%, -58%) scale(1.05) rotate(0deg); }
+    100% { opacity: 0; transform: translate(-50%, -78%) scale(0.95) rotate(0deg); }
   }
 
   /* ============ STAGE SHAKE ============ */
