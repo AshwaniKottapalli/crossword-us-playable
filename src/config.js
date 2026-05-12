@@ -19,7 +19,7 @@ export const CONFIG = {
     holdMs: 1400,
   },
 
-  praise: ['NICE!', 'GENIUS!', 'STAR-SPANGLED!', 'ALL-AMERICAN!', 'TRUE PATRIOT!', 'ON FIRE!', 'UNSTOPPABLE!'],
+  praise: ['NICE!', 'BOOM!', 'WOW!', 'USA!', 'LEGEND!', 'HERO!', 'BRAVO!'],
 
   tease: {
     badge:  '🔒 LEVEL 6',

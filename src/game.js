@@ -109,8 +109,6 @@ function updateCursor() {
 function onCorrectDrop(r, c, ch, tile) {
   Audio.play('pop');
   Grid.markCorrect(r, c, ch);
-  UI.ringBurstAt(r, c);
-  UI.shakeStage();
   streak++;
   UI.setStreak(streak);
   updateCursor();
