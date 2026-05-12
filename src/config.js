@@ -15,9 +15,11 @@ export const CONFIG = {
   },
 
   win: {
-    banner: 'YOU REACHED LEVEL 5! 🎉',
+    banner: '⭐ YOU REACHED LEVEL 5! ⭐',
     holdMs: 1400,
   },
+
+  praise: ['NICE!', 'GENIUS!', 'STAR-SPANGLED!', 'ALL-AMERICAN!', 'TRUE PATRIOT!', 'ON FIRE!', 'UNSTOPPABLE!'],
 
   tease: {
     badge:  '🔒 LEVEL 6',

@@ -112,25 +112,38 @@ function onPointerUp(e) {
     const r = +dropCell.dataset.r, c = +dropCell.dataset.c;
     const expected = opts?.expectedChar?.(r, c);
     if (expected === tile.ch) {
-      // correct drop — animate ghost into cell, then remove
+      // correct drop — animate ghost into cell with squash-stretch, then remove
       const target = dropCell.getBoundingClientRect();
       const stageRect = document.getElementById('stage').getBoundingClientRect();
-      ghost.style.transition = 'left .18s ease, top .18s ease, transform .18s ease';
+      ghost.style.transition = 'left .16s ease, top .16s ease, transform .16s ease';
       ghost.style.left = (target.left - stageRect.left) + 'px';
       ghost.style.top  = (target.top  - stageRect.top)  + 'px';
       ghost.style.width  = target.width + 'px';
       ghost.style.height = target.height + 'px';
+      // mid-flight: prep for squash on land
+      setTimeout(() => {
+        ghost.style.transition = 'transform .09s ease-out';
+        ghost.style.transform = 'scale(1.25, 0.78)';
+      }, 150);
+      setTimeout(() => {
+        ghost.style.transition = 'transform .12s ease-out';
+        ghost.style.transform = 'scale(1, 1)';
+      }, 240);
       setTimeout(() => {
         ghost.remove();
         tile.el.style.opacity = '';
         tile.el.classList.add('gone');
         opts?.onCorrect?.(r, c, tile.ch, tile);
-      }, 180);
+      }, 360);
       return;
+    } else {
+      // wrong cell — flash it red
+      opts?.onWrongCell?.(r, c);
     }
   }
 
-  // wrong / off-grid drop — spring back to the tile's home slot, then restore.
+  // wrong / off-grid drop — wiggle the ghost then spring back to the tile's home slot.
+  ghost.classList.add('wiggle');
   const tRect = tile.el.getBoundingClientRect();
   const stageRect = document.getElementById('stage').getBoundingClientRect();
   ghost.style.transition = 'left .28s cubic-bezier(.34,1.56,.64,1), top .28s cubic-bezier(.34,1.56,.64,1)';
@@ -140,7 +153,7 @@ function onPointerUp(e) {
     ghost.remove();
     tile.el.style.opacity = '';
     opts?.onWrongDrop?.();
-  }, 280);
+  }, 320);
 }
 
 function cellUnder(x, y) {

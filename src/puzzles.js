@@ -21,22 +21,22 @@ export const PUZZLE = {
     [_, G('B',true,1), G('O',true), G('S',true,2), G('T',true), G('O',true), G('N',true), _, _, _, _],
     // row 1 — SANTAFE letter
     [_, _, _, G('A',true), _, _, _, _, _, _, _],
-    // row 2 — NEWYORK (3 Across). First N locked (SANTAFE crossing).
-    [_, _, _, G('N',true,3), G('E',false), G('W',false), G('Y',false), G('O',false), G('R',false), G('K',false), _],
+    // row 2 — NEWYORK (3 Across). First N locked (SANTAFE), E + R pre-revealed.
+    [_, _, _, G('N',true,3), G('E',true), G('W',false), G('Y',false), G('O',false), G('R',true), G('K',false), _],
     // row 3 — SANTAFE letter
     [_, _, _, G('T',true), _, _, _, _, _, _, _],
-    // row 4 — ATLANTA (4 Across), A at col 3 locked (SANTAFE crossing).
-    [G('A',false,4), G('T',false), G('L',false), G('A',true), G('N',false), G('T',false), G('A',false), _, _, _, _],
-    // row 5 — AUSTIN U + SANTAFE F + DENVER D
-    [G('U',false), _, _, G('F',true), _, _, _, _, G('D',true,5), _, _],
+    // row 4 — ATLANTA (4 Across). A0 + A6 pre-revealed (gives shape), middle player-fill.
+    [G('A',true,4), G('T',false), G('L',false), G('A',true), G('N',false), G('T',false), G('A',true), _, _, _, _],
+    // row 5 — AUSTIN U pre-revealed + SANTAFE F + DENVER D
+    [G('U',true), _, _, G('F',true), _, _, _, _, G('D',true,5), _, _],
     // row 6 — AUSTIN S + SANTAFE E + DENVER E
     [G('S',false), _, _, G('E',true), _, _, _, _, G('E',true), _, _],
-    // row 7 — AUSTIN T + PHOENIX (6 Across) + DENVER N (locked at col 8)
-    [G('T',false), _, _, _, G('P',false,6), G('H',false), G('O',false), G('E',false), G('N',true), G('I',false), G('X',false)],
-    // row 8 — AUSTIN I + DENVER V
-    [G('I',false), _, _, _, _, _, _, _, G('V',true), _, _],
-    // row 9 — NASHVILLE (7 Across) — last E locked (DENVER crossing)
-    [G('N',false,7), G('A',false), G('S',false), G('H',false), G('V',false), G('I',false), G('L',false), G('L',false), G('E',true), _, _],
+    // row 7 — AUSTIN T + PHOENIX (6 Across). H + I pre-revealed.
+    [G('T',false), _, _, _, G('P',false,6), G('H',true), G('O',false), G('E',false), G('N',true), G('I',true), G('X',false)],
+    // row 8 — AUSTIN I pre-revealed + DENVER V
+    [G('I',true), _, _, _, _, _, _, _, G('V',true), _, _],
+    // row 9 — NASHVILLE (7 Across). A (pos 1) + V (pos 4) pre-revealed.
+    [G('N',false,7), G('A',true), G('S',false), G('H',false), G('V',true), G('I',false), G('L',false), G('L',false), G('E',true), _, _],
     // row 10 — DENVER R
     [_, _, _, _, _, _, _, _, G('R',true), _, _],
   ],

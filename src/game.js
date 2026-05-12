@@ -12,6 +12,7 @@ import * as UI from './ui.js';
 const STATE = { LOADING:'LOADING', INTRO:'INTRO', PLAYING:'PLAYING', WIN:'WIN', CTA:'CTA' };
 let state = STATE.LOADING;
 let activeWord = null;
+let streak = 0;
 const completedWords = new Set();
 
 export function start() {
@@ -75,7 +76,8 @@ function advanceActiveWord() {
     Bank.renderBank(bankForWord(PUZZLE, activeWord), {
       expectedChar: (r, c) => Grid.expectedChar(r, c),
       onCorrect:    onCorrectDrop,
-      onWrongDrop:  () => Audio.play('thud'),
+      onWrongCell:  (r, c) => UI.flashCellWrong(r, c),
+      onWrongDrop:  () => { Audio.play('thud'); streak = 0; UI.setStreak(0); },
       onDragStart:  () => Audio.unlock(),
     });
   } else {
@@ -87,6 +89,10 @@ function advanceActiveWord() {
 function onCorrectDrop(r, c, ch, tile) {
   Audio.play('pop');
   Grid.markCorrect(r, c, ch);
+  UI.ringBurstAt(r, c);
+  UI.shakeStage();
+  streak++;
+  UI.setStreak(streak);
 
   // detect newly-completed words (a drop may complete more than one word via crossings)
   for (const w of PUZZLE.words) {
@@ -94,6 +100,7 @@ function onCorrectDrop(r, c, ch, tile) {
     if (Grid.isWordComplete(w)) {
       completedWords.add(w.id);
       Cascade.celebrateWord(w, Audio);
+      UI.popPraise();
     }
   }
 

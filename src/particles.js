@@ -66,10 +66,50 @@ export function burstConfetti() {
 function pickColor(c, kind) {
   if (c) return c;
   if (kind === 'confetti') {
-    const pal = ['#ff5b6c', '#ffd84a', '#6ee04a', '#5ec8ff', '#c47bff'];
+    const pal = ['#bf0a30', '#ffffff', '#002868', '#e8eaf6'];
     return pal[(Math.random() * pal.length) | 0];
   }
   return '#ffd84a';
+}
+
+// Expanding ring of sparkles for the fireworks finale.
+export function burstFirework(x, y, opts = {}) {
+  const count = opts.count ?? 24;
+  const speed = opts.speed ?? 240;
+  const color = opts.color || pickColor(null, 'confetti');
+  for (let i = 0; i < count; i++) {
+    const ang = (i / count) * Math.PI * 2;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * speed,
+      vy: Math.sin(ang) * speed,
+      g: 60,
+      life: 0,
+      max: 1.1,
+      size: 4,
+      color,
+      kind: 'sparkle',
+      rot: 0, vrot: 0,
+    });
+  }
+  // small delayed secondary fan
+  setTimeout(() => {
+    for (let i = 0; i < count / 2; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      particles.push({
+        x, y,
+        vx: Math.cos(ang) * speed * 0.55,
+        vy: Math.sin(ang) * speed * 0.55,
+        g: 140,
+        life: 0,
+        max: 1.4,
+        size: 3,
+        color: '#ffd84a',
+        kind: 'sparkle',
+        rot: 0, vrot: 0,
+      });
+    }
+  }, 120);
 }
 
 function loop(t) {

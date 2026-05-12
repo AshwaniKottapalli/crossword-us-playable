@@ -77,6 +77,80 @@ function onInstall() {
   else                                            window.open(url, '_blank');
 }
 
+let lastPraise = null;
+export function popPraise() {
+  const el = document.getElementById('praise');
+  if (!el) return;
+  const list = CONFIG.praise;
+  let next;
+  do { next = list[(Math.random() * list.length) | 0]; }
+  while (list.length > 1 && next === lastPraise);
+  lastPraise = next;
+  el.textContent = next;
+  // restart animation
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+}
+
+export function setStreak(n) {
+  const el = document.getElementById('streak');
+  if (!el) return;
+  if (n <= 0) {
+    el.classList.remove('show', 'fire', 'bump');
+    return;
+  }
+  el.textContent = n >= 4 ? '🔥 ON FIRE!' : `🔥 ×${n}`;
+  el.classList.toggle('fire', n >= 4);
+  el.classList.add('show');
+  // restart bump animation
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+}
+
+export function shakeStage() {
+  const stage = document.getElementById('stage');
+  if (!stage) return;
+  stage.classList.remove('shake');
+  void stage.offsetWidth;
+  stage.classList.add('shake');
+  setTimeout(() => stage.classList.remove('shake'), 200);
+}
+
+export function ringBurstAt(r, c) {
+  const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`) ||
+                 document.querySelector(`.cell.correct[data-r="${r}"][data-c="${c}"]`);
+  const stage = document.getElementById('stage');
+  if (!stage) return;
+  // fall back: find cell by coordinates from the grid layout
+  const sRect = stage.getBoundingClientRect();
+  let cx, cy;
+  if (cellEl) {
+    const rect = cellEl.getBoundingClientRect();
+    cx = rect.left - sRect.left + rect.width / 2;
+    cy = rect.top  - sRect.top  + rect.height / 2;
+  } else {
+    return;
+  }
+  const ring = document.createElement('div');
+  ring.className = 'ring-burst';
+  ring.style.left = cx + 'px';
+  ring.style.top  = cy + 'px';
+  ring.style.transform = 'translate(-50%,-50%) scale(0.4)';
+  stage.appendChild(ring);
+  setTimeout(() => ring.remove(), 600);
+}
+
+export function flashCellWrong(r, c) {
+  const cellEl = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"]`);
+  if (!cellEl) return;
+  cellEl.classList.remove('wrong-flash');
+  void cellEl.offsetWidth;
+  cellEl.classList.add('wrong-flash');
+  setTimeout(() => cellEl.classList.remove('wrong-flash'), 450);
+}
+
 export function setBackdrop(url) {
   const img = new Image();
   img.onload = () => {

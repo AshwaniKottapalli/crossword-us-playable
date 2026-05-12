@@ -16,7 +16,16 @@ export function celebrateWord(word, audio) {
 
 export function celebrateAll(audio) {
   audio?.play?.('cheer');
-  Particles.burstConfetti();
-  setTimeout(() => Particles.burstConfetti(), 350);
-  setTimeout(() => Particles.burstConfetti(), 750);
+  const stage = document.getElementById('stage');
+  const w = stage.clientWidth, h = stage.clientHeight;
+  // three fireworks at staggered positions, with confetti weaved in
+  const shots = [
+    { x: w * 0.30, y: h * 0.35, color: '#bf0a30', delay: 0   },
+    { x: w * 0.70, y: h * 0.40, color: '#ffffff', delay: 220 },
+    { x: w * 0.50, y: h * 0.28, color: '#002868', delay: 460 },
+  ];
+  shots.forEach(s => setTimeout(() => Particles.burstFirework(s.x, s.y, { color: s.color }), s.delay));
+  setTimeout(() => Particles.burstConfetti(), 150);
+  setTimeout(() => Particles.burstConfetti(), 500);
+  setTimeout(() => Particles.burstConfetti(), 900);
 }
