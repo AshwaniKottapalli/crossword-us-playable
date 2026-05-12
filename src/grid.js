@@ -113,6 +113,17 @@ export function setActiveWord(word) {
   }
 }
 
+export function setCursor(r, c) {
+  for (const { el } of nodes.values()) el.classList.remove('cursor');
+  if (r == null || c == null) return;
+  const n = nodes.get(key(r, c));
+  if (n) n.el.classList.add('cursor');
+}
+
+export function clearCursor() {
+  for (const { el } of nodes.values()) el.classList.remove('cursor');
+}
+
 export function markCorrect(r, c, ch) {
   const n = nodes.get(key(r, c));
   if (!n) return;

@@ -1,6 +1,6 @@
 // State machine: LOADING → INTRO → PLAYING → WIN → CTA.
 
-import { PUZZLE, bankForWord } from './puzzles.js';
+import { PUZZLE, bankForWord, wordCells } from './puzzles.js';
 import * as Grid from './grid.js';
 import * as Bank from './bank.js';
 import * as Hint from './hint.js';
@@ -74,16 +74,36 @@ function advanceActiveWord() {
   if (activeWord) {
     Hint.setHint(activeWord.hint);
     Bank.renderBank(bankForWord(PUZZLE, activeWord), {
-      expectedChar: (r, c) => Grid.expectedChar(r, c),
-      onCorrect:    onCorrectDrop,
-      onWrongCell:  (r, c) => UI.flashCellWrong(r, c),
-      onWrongDrop:  () => { Audio.play('thud'); streak = 0; UI.setStreak(0); },
-      onDragStart:  () => Audio.unlock(),
+      findCellForLetter,
+      getCursorCell:    () => Grid.findFirstEmptyOf(activeWord),
+      onCorrect:        onCorrectDrop,
+      onWrongCell:      (r, c) => UI.flashCellWrong(r, c),
+      onWrongDrop:      () => { Audio.play('thud'); streak = 0; UI.setStreak(0); },
+      onDragStart:      () => Audio.unlock(),
     });
+    updateCursor();
   } else {
     Hint.hideHint();
     Bank.clearBank();
+    Grid.clearCursor();
   }
+}
+
+function findCellForLetter(ch) {
+  if (!activeWord) return null;
+  for (const { r, c, cell } of wordCells(PUZZLE, activeWord)) {
+    if (cell && !cell.prefilled && !cell.filled && cell.ch === ch) {
+      return { r, c, ch };
+    }
+  }
+  return null;
+}
+
+function updateCursor() {
+  if (!activeWord) { Grid.clearCursor(); return; }
+  const next = Grid.findFirstEmptyOf(activeWord);
+  if (next) Grid.setCursor(next.r, next.c);
+  else      Grid.clearCursor();
 }
 
 function onCorrectDrop(r, c, ch, tile) {
@@ -93,6 +113,7 @@ function onCorrectDrop(r, c, ch, tile) {
   UI.shakeStage();
   streak++;
   UI.setStreak(streak);
+  updateCursor();
 
   // detect newly-completed words (a drop may complete more than one word via crossings)
   let praisedThisDrop = false;
