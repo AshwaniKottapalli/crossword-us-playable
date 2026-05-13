@@ -29,7 +29,8 @@
     width: min(100vw, 540px);
     height: min(100dvh, calc(min(100vw, 540px) * 16 / 9), 960px);
     display:flex; flex-direction:column;
-    justify-content:center;       /* keep header/hint/grid/bank packed tight, empty space split top+bottom */
+    justify-content:center;       /* center hint/grid/bank in the space below header */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 90px); /* reserve room for absolute-positioned header */
     background-color:#0a0f24;
     background-image: var(--backdrop, none);
     background-size: cover; background-position:center;
@@ -45,10 +46,10 @@
 
   /* ============ HEADER ============ */
   .header{
-    position:relative; flex:0 0 auto;
+    position:absolute; top:0; left:0; right:0;       /* anchor to stage top */
     padding: max(10px, env(safe-area-inset-top, 0)) 80px 10px 14px; /* reserve right space for streak pill */
     text-align:center; z-index:5;
-    background: linear-gradient(180deg, rgba(8,12,40,0.85), rgba(8,12,40,0));
+    background: linear-gradient(180deg, rgba(8,12,40,0.9), rgba(8,12,40,0));
   }
   .header .line1{ font-size: clamp(12px, 3.8vmin, 17px); font-weight:800; letter-spacing:0.4px; color:#fff; }
   .header .line1 .accent{ color:#ffd84a; }
