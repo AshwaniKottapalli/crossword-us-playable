@@ -13,15 +13,15 @@
     touch-action: none;
   }
   #app{
-    position:fixed; inset:0; display:grid; place-items:center;
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
     background:#0a0f24;
-    height:100dvh;
+    width:100vw; height:100dvh;
   }
   #stage{
     position:relative;
-    width:100%; height:100%;
-    max-width:540px; max-height:960px;
-    aspect-ratio: 9 / 16;
+    width: min(100vw, 540px);
+    height: min(100dvh, calc(min(100vw, 540px) * 16 / 9), 960px);
     display:flex; flex-direction:column;
     background-color:#0a0f24;
     background-image: var(--backdrop, none);
