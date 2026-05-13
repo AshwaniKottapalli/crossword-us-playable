@@ -69,27 +69,23 @@ export function renderTease(tease, mountEl) {
 }
 
 function fitCellSize(puzzle) {
-  // Set --cell-size so the grid AND the bank tiles fit horizontally,
-  // and the grid fits vertically. Cell-size also bounds the bank tile,
-  // which is var(--cell-size) * 1.15 wide.
-  const stage = document.getElementById('stage');
-  const stageEl = document.getElementById('grid-stage');
-  // Use the smaller of stage clientWidth and window.innerWidth — defensive
-  // against weird measurement timing on first paint.
-  const stageW = Math.min(
-    stage ? stage.clientWidth : window.innerWidth,
-    window.innerWidth
-  );
-  const stageH = stageEl ? stageEl.clientHeight : 600;
-  const gapPx = 3;
-  const padX = 36;   // extra safety margin so cells never touch viewport edge
-  const padY = 20;
-  const wAvail = Math.max(220, stageW - padX);
-  const hAvail = Math.max(220, stageH - padY);
-  const byW = Math.floor((wAvail - (puzzle.cols - 1) * gapPx) / puzzle.cols);
-  const byH = Math.floor((hAvail - (puzzle.rows - 1) * gapPx) / puzzle.rows);
-  const sz = Math.max(16, Math.min(44, byW, byH));
-  document.documentElement.style.setProperty('--cell-size', sz + 'px');
+  // --cell-size is now defined in CSS via clamp() on :root — bulletproof
+  // across browsers and in-app webviews. JS only tightens it further if
+  // the grid would overflow vertically (rare, short viewports).
+  const gridStageEl = document.getElementById('grid-stage');
+  if (!gridStageEl) return;
+  const h = gridStageEl.clientHeight;
+  if (!h) return;
+  const gapPx = 3, padY = 16;
+  const byH = Math.floor((h - padY - (puzzle.rows - 1) * gapPx) / puzzle.rows);
+  // Read what CSS currently resolves --cell-size to.
+  const cssSize = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--cell-size')
+  ) || 40;
+  // Only override if height-constrained — never loosen what CSS already capped.
+  if (byH > 0 && byH < cssSize) {
+    document.documentElement.style.setProperty('--cell-size', byH + 'px');
+  }
 }
 
 export function cellAt(r, c) {

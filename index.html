@@ -12,6 +12,12 @@
     -webkit-tap-highlight-color: transparent; user-select:none; -webkit-user-select:none;
     touch-action: none;
   }
+  /* Cell size lives in CSS so it's authoritative across all viewports
+     (including weird in-app webviews where JS clientWidth measurements
+     can lie). 11 columns + gaps + 64px of safety margin. */
+  :root{
+    --cell-size: clamp(18px, calc((min(100vw, 540px) - 64px) / 11), 40px);
+  }
   #app{
     position:fixed; inset:0;
     display:flex; align-items:center; justify-content:center;
@@ -39,13 +45,13 @@
   /* ============ HEADER ============ */
   .header{
     position:relative; flex:0 0 auto;
-    padding: max(10px, env(safe-area-inset-top, 0)) 14px 10px;
+    padding: max(10px, env(safe-area-inset-top, 0)) 80px 10px 14px; /* reserve right space for streak pill */
     text-align:center; z-index:5;
     background: linear-gradient(180deg, rgba(8,12,40,0.85), rgba(8,12,40,0));
   }
-  .header .line1{ font-size: clamp(13px, 4.3vmin, 18px); font-weight:800; letter-spacing:0.5px; color:#fff; }
+  .header .line1{ font-size: clamp(12px, 3.8vmin, 17px); font-weight:800; letter-spacing:0.4px; color:#fff; }
   .header .line1 .accent{ color:#ffd84a; }
-  .header .line2{ font-size: clamp(16px, 5.2vmin, 22px); font-weight:900; letter-spacing:0.5px; color:#fff; margin-top:2px; }
+  .header .line2{ font-size: clamp(14px, 4.4vmin, 20px); font-weight:900; letter-spacing:0.4px; color:#fff; margin-top:2px; }
 
   /* ============ STREAK PILL ============ */
   #streak{
