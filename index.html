@@ -15,9 +15,9 @@
   /* Cell size is a single hardcoded value. In-app webviews (WhatsApp/
      Instagram/etc.) lie about 100vw AND about media-query viewport
      widths, so any responsive scheme silently breaks there. 11 cols *
-     26 + 30 gaps = 316px — fits literally any mobile viewport, even
-     the 320px iPhone SE 1st gen. Desktop preview just looks compact. */
-  :root{ --cell-size: 26px; }
+     30 + 30 gaps = 360px — fits 360px+ mobile viewports with zero
+     margin to spare, fits 375px+ comfortably. */
+  :root{ --cell-size: 30px; }
   #app{
     position:fixed; inset:0;
     display:flex; align-items:center; justify-content:center;
@@ -178,7 +178,7 @@
     min-height: 0;          /* allow flex shrink */
     display:flex; align-items:center; justify-content:center;
     z-index:2;
-    padding: 4px 8px;
+    padding: 4px 0;         /* no horizontal padding — grid needs every px on narrow phones */
   }
   .grid{
     display:grid; gap:3px;
