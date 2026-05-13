@@ -69,20 +69,26 @@ export function renderTease(tease, mountEl) {
 }
 
 function fitCellSize(puzzle) {
-  // Set --cell-size so the grid fits in available width AND height with margin,
-  // and the bank tiles (cell-size * 1.15) still fit horizontally too.
+  // Set --cell-size so the grid AND the bank tiles fit horizontally,
+  // and the grid fits vertically. Cell-size also bounds the bank tile,
+  // which is var(--cell-size) * 1.15 wide.
   const stage = document.getElementById('stage');
   const stageEl = document.getElementById('grid-stage');
-  const stageW = stage ? stage.clientWidth  : window.innerWidth;
+  // Use the smaller of stage clientWidth and window.innerWidth — defensive
+  // against weird measurement timing on first paint.
+  const stageW = Math.min(
+    stage ? stage.clientWidth : window.innerWidth,
+    window.innerWidth
+  );
   const stageH = stageEl ? stageEl.clientHeight : 600;
   const gapPx = 3;
-  const padX = 28;
-  const padY = 16;
+  const padX = 36;   // extra safety margin so cells never touch viewport edge
+  const padY = 20;
   const wAvail = Math.max(220, stageW - padX);
   const hAvail = Math.max(220, stageH - padY);
   const byW = Math.floor((wAvail - (puzzle.cols - 1) * gapPx) / puzzle.cols);
   const byH = Math.floor((hAvail - (puzzle.rows - 1) * gapPx) / puzzle.rows);
-  const sz = Math.max(18, Math.min(46, byW, byH));
+  const sz = Math.max(16, Math.min(44, byW, byH));
   document.documentElement.style.setProperty('--cell-size', sz + 'px');
 }
 

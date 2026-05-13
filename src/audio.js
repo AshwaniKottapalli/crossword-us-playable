@@ -32,7 +32,21 @@ export function initAudio() {
 
 export function unlock() {
   if (!ctx) return;
-  if (ctx.state === 'suspended') ctx.resume();
+  // iOS Safari: a one-shot silent buffer played within a user gesture is the
+  // most reliable way to fully unlock the audio context. Just calling resume()
+  // sometimes leaves the context in a half-unlocked state.
+  try {
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start(0);
+  } catch (e) { /* ignore */ }
+  if (ctx.state === 'suspended') {
+    const p = ctx.resume();
+    // some browsers return a Promise; treat both paths the same
+    if (p && typeof p.then === 'function') p.catch(() => {});
+  }
 }
 
 export function play(name) {
