@@ -17,7 +17,13 @@ const completedWords = new Set();
 
 export function start() {
   Audio.initAudio();
-  document.addEventListener('pointerdown', () => Audio.unlock(), { once: true });
+  // iOS Safari is picky about which event counts as a user gesture.
+  // Listen on every plausible one and call unlock() on each — it's
+  // idempotent and re-running it helps recover after tab backgrounding.
+  const onGesture = () => Audio.unlock();
+  ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'].forEach(ev => {
+    document.addEventListener(ev, onGesture, { capture: true });
+  });
   setState(STATE.INTRO);
 }
 

@@ -1,58 +1,74 @@
-// Web Audio: procedural SFX recipes + optional file-loaded voice.
-// All play() calls before unlock are queued; drained on statechange = running.
+// Web Audio with iOS-friendly lazy init.
+//
+// iOS Safari refuses to unlock an AudioContext that was created outside a
+// user gesture, no matter how many times you call resume(). So the context
+// must be CREATED inside the first user gesture, then primed with a silent
+// buffer, then resumed. All three steps run synchronously in unlock().
+//
+// Hardware mute switch: iOS Web Audio respects the physical ring/silent
+// toggle. There is no software workaround. If the user is on silent mode,
+// nothing here plays — that's expected.
 
 import { CONFIG } from './config.js';
 
 let ctx = null;
 let master = null;
 let buffers = new Map();
-let queue = [];           // names waiting on ctx.resume() or buffer load
-let unlocked = false;
+let queue = [];
+let inited = false;
 
 export function initAudio() {
-  try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    ctx = new AC();
-    master = ctx.createGain();
-    master.gain.value = CONFIG.audio.masterGain;
-    master.connect(ctx.destination);
-    ctx.onstatechange = () => {
-      if (ctx.state === 'running' && !unlocked) {
-        unlocked = true;
-        const q = queue.slice(); queue = [];
-        q.forEach(name => play(name));
-      }
-    };
-    // try to load voice files (optional)
-    loadFile('voice_intro', CONFIG.audio.voiceIntro);
-    loadFile('voice_win',   CONFIG.audio.voiceWin);
-  } catch (e) { /* no audio — silent fallback */ }
+  // Deliberately empty. AudioContext is created lazily inside unlock()
+  // so that creation happens within a user gesture (iOS requirement).
 }
 
+// Call this from a user-gesture handler (pointerdown / touchstart / click).
 export function unlock() {
-  if (!ctx) return;
-  // iOS Safari: a one-shot silent buffer played within a user gesture is the
-  // most reliable way to fully unlock the audio context. Just calling resume()
-  // sometimes leaves the context in a half-unlocked state.
+  if (inited && ctx && ctx.state === 'running') return;
+
   try {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = CONFIG.audio.masterGain;
+      master.connect(ctx.destination);
+
+      ctx.onstatechange = () => {
+        if (ctx.state === 'running') drain();
+      };
+
+      // start loading voice files now that we have a context
+      loadFile('voice_intro', CONFIG.audio.voiceIntro);
+      loadFile('voice_win',   CONFIG.audio.voiceWin);
+    }
+
+    // iOS silent prime — a 1-sample buffer played inside the gesture
+    // fully unlocks the context. Doing this on every unlock() is harmless
+    // and helps recover from suspended states (e.g. tab backgrounded).
     const buf = ctx.createBuffer(1, 1, 22050);
     const src = ctx.createBufferSource();
     src.buffer = buf;
     src.connect(ctx.destination);
     src.start(0);
-  } catch (e) { /* ignore */ }
-  if (ctx.state === 'suspended') {
-    const p = ctx.resume();
-    // some browsers return a Promise; treat both paths the same
-    if (p && typeof p.then === 'function') p.catch(() => {});
-  }
+
+    if (ctx.state === 'suspended') {
+      const p = ctx.resume();
+      if (p && typeof p.then === 'function') p.catch(() => {});
+    }
+
+    inited = true;
+    // immediately try to drain the queue (some browsers report 'running' synchronously)
+    drain();
+  } catch (e) { /* silent fallback */ }
 }
 
 export function play(name) {
-  if (!ctx) return;
-  if (ctx.state !== 'running') { queue.push(name); return; }
-  // voice files: if buffer not loaded yet, queue for load completion
+  if (!ctx || !inited || ctx.state !== 'running') {
+    queue.push(name);
+    return;
+  }
   if (name.startsWith('voice')) {
     if (buffers.has(name)) playBuffer(buffers.get(name), CONFIG.audio.voiceGain);
     else queue.push(name);
@@ -65,6 +81,12 @@ export function play(name) {
     case 'cheer': return chord([523, 659, 784, 1046], 0.45, 'sine', 0.4);
     case 'tick':  return tone({ f: 1200, dur: 0.04, type: 'square', g: 0.25 });
   }
+}
+
+function drain() {
+  if (!ctx || ctx.state !== 'running') return;
+  const q = queue.slice(); queue = [];
+  q.forEach(name => play(name));
 }
 
 function tone({ f, dur, type = 'sine', g = 0.3, slide = 0 }) {
@@ -94,7 +116,7 @@ async function loadFile(name, url) {
     const ab = await res.arrayBuffer();
     const buf = await ctx.decodeAudioData(ab);
     buffers.set(name, buf);
-    // drain any queued plays of this name
+    // drain any plays of this name that were queued while the buffer was loading
     if (queue.includes(name) && ctx.state === 'running') {
       queue = queue.filter(n => n !== name);
       playBuffer(buf, CONFIG.audio.voiceGain);
