@@ -12,12 +12,14 @@
     -webkit-tap-highlight-color: transparent; user-select:none; -webkit-user-select:none;
     touch-action: none;
   }
-  /* Cell size lives in CSS so it's authoritative across all viewports
-     (including weird in-app webviews where JS clientWidth measurements
-     can lie). 11 columns + gaps + 64px of safety margin. */
-  :root{
-    --cell-size: clamp(18px, calc((min(100vw, 540px) - 64px) / 11), 40px);
-  }
+  /* Cell size is hardcoded small enough to fit ANY mobile viewport
+     including in-app webviews (WhatsApp/Instagram/etc.) that lie about
+     100vw. Media queries scale it up on bigger screens. 11 cols * 28 +
+     30 gaps = 338px — fits comfortably even in 360px-wide viewports. */
+  :root{ --cell-size: 28px; }
+  @media (min-width: 410px) { :root{ --cell-size: 30px; } }
+  @media (min-width: 480px) { :root{ --cell-size: 34px; } }
+  @media (min-width: 540px) { :root{ --cell-size: 38px; } }
   #app{
     position:fixed; inset:0;
     display:flex; align-items:center; justify-content:center;

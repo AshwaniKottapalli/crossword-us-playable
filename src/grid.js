@@ -68,24 +68,11 @@ export function renderTease(tease, mountEl) {
   }
 }
 
-function fitCellSize(puzzle) {
-  // --cell-size is now defined in CSS via clamp() on :root — bulletproof
-  // across browsers and in-app webviews. JS only tightens it further if
-  // the grid would overflow vertically (rare, short viewports).
-  const gridStageEl = document.getElementById('grid-stage');
-  if (!gridStageEl) return;
-  const h = gridStageEl.clientHeight;
-  if (!h) return;
-  const gapPx = 3, padY = 16;
-  const byH = Math.floor((h - padY - (puzzle.rows - 1) * gapPx) / puzzle.rows);
-  // Read what CSS currently resolves --cell-size to.
-  const cssSize = parseFloat(
-    getComputedStyle(document.documentElement).getPropertyValue('--cell-size')
-  ) || 40;
-  // Only override if height-constrained — never loosen what CSS already capped.
-  if (byH > 0 && byH < cssSize) {
-    document.documentElement.style.setProperty('--cell-size', byH + 'px');
-  }
+function fitCellSize(_puzzle) {
+  // --cell-size is now fully controlled by CSS via media queries on :root.
+  // JS-side measurement was unreliable in in-app webviews (WhatsApp/etc.)
+  // and was making the grid overflow the viewport. No-op kept so callers
+  // don't need to change.
 }
 
 export function cellAt(r, c) {
