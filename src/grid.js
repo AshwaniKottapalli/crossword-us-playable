@@ -68,11 +68,53 @@ export function renderTease(tease, mountEl) {
   }
 }
 
-function fitCellSize(_puzzle) {
-  // --cell-size is now fully controlled by CSS via media queries on :root.
-  // JS-side measurement was unreliable in in-app webviews (WhatsApp/etc.)
-  // and was making the grid overflow the viewport. No-op kept so callers
-  // don't need to change.
+function fitCellSize(puzzle) {
+  const rows = puzzle?.rows || 11;
+  const cols = puzzle?.cols || 11;
+
+  // Combine every width/height measurement we have and pick the SMALLEST.
+  // Different sources lie in different webviews (WhatsApp inflates 100vw,
+  // some browsers report clientWidth larger than visible, etc.) — taking
+  // the min defends against any one of them overshooting.
+  const wCandidates = [
+    window.visualViewport?.width,
+    window.innerWidth,
+    document.documentElement.clientWidth,
+  ].filter(v => typeof v === 'number' && v > 0);
+  const hCandidates = [
+    window.visualViewport?.height,
+    window.innerHeight,
+    document.documentElement.clientHeight,
+  ].filter(v => typeof v === 'number' && v > 0);
+  const vw = wCandidates.length ? Math.min(...wCandidates) : 360;
+  const vh = hCandidates.length ? Math.min(...hCandidates) : 640;
+
+  // Reserved vertical overhead for the rest of the UI on a portrait phone:
+  //   ~90 header (with safe-area) + ~50 hint + ~80 bank + ~30 margins = 250
+  // Plus 20 more so cells don't kiss the edges visually.
+  const VERTICAL_OVERHEAD = 270;
+  const HORIZONTAL_PAD = 16;
+
+  const availW = Math.min(vw, 540) - HORIZONTAL_PAD;
+  const availH = vh - VERTICAL_OVERHEAD;
+
+  const gap = 3;
+  const byW = Math.floor((availW - (cols - 1) * gap) / cols);
+  const byH = Math.floor((availH - (rows - 1) * gap) / rows);
+
+  // Floor 16px so cells stay readable; cap 44px so desktop doesn't look silly.
+  const sz = Math.max(16, Math.min(44, byW, byH));
+  document.documentElement.style.setProperty('--cell-size', sz + 'px');
+}
+
+// Re-fit on rotation, keyboard show/hide, browser chrome show/hide.
+function onViewportChange() {
+  if (activePuzzle) fitCellSize(activePuzzle);
+}
+window.addEventListener('resize', onViewportChange);
+window.addEventListener('orientationchange', onViewportChange);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', onViewportChange);
 }
 
 export function cellAt(r, c) {
@@ -169,3 +211,8 @@ export function celebrateWord(word, onDone) {
 }
 
 function key(r, c) { return r + ',' + c; }
+
+// Run an initial fit at module-load time so --cell-size is correct even
+// before the grid mounts (the intro card / preload phases will use it for
+// any debug rendering and the value is ready when renderGrid() fires).
+fitCellSize({ rows: 11, cols: 11 });
